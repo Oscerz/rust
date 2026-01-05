@@ -10,14 +10,10 @@ use fluent_syntax::parser;
 use regex::Regex;
 
 use crate::diagnostics::{CheckId, RunningCheck, TidyCtx};
-use crate::walk::{filter_dirs, walk};
+use crate::walk::{filter_dirs, filter_not_fluent, walk};
 
 fn message() -> &'static Regex {
     static_regex!(r#"(?m)^([a-zA-Z0-9_]+)\s*=\s*"#)
-}
-
-fn is_fluent(path: &Path) -> bool {
-    path.extension().is_some_and(|ext| ext == "ftl")
 }
 
 fn check_alphabetic(
@@ -94,7 +90,7 @@ pub fn check(path: &Path, tidy_ctx: TidyCtx) {
     let mut all_defined_msgs = HashMap::new();
     walk(
         path,
-        |path, is_dir| filter_dirs(path) || (!is_dir && !is_fluent(path)),
+        |path, is_dir| filter_dirs(path) || (!is_dir && filter_not_fluent(path)),
         &mut |ent, contents| {
             if bless {
                 let sorted = sort_messages(

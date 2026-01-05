@@ -5,7 +5,7 @@ use std::path::Path;
 use fluent_syntax::ast::{Entry, Message, PatternElement};
 
 use crate::diagnostics::{CheckId, RunningCheck, TidyCtx};
-use crate::walk::{filter_dirs, walk};
+use crate::walk::{filter_dirs, filter_not_fluent, walk};
 
 #[rustfmt::skip]
 const ALLOWED_CAPITALIZED_WORDS: &[&str] = &[
@@ -22,10 +22,6 @@ const ALLOWED_CAPITALIZED_WORDS: &[&str] = &[
     "VS", // VS Code
     // tidy-alphabetical-end
 ];
-
-fn filter_fluent(path: &Path) -> bool {
-    if let Some(ext) = path.extension() { ext.to_str() != Some("ftl") } else { true }
-}
 
 fn is_allowed_capitalized_word(msg: &str) -> bool {
     ALLOWED_CAPITALIZED_WORDS.iter().any(|word| {
@@ -57,7 +53,7 @@ pub fn check(path: &Path, tidy_ctx: TidyCtx) {
     let mut check = tidy_ctx.start_check(CheckId::new("fluent_lowercase").path(path));
     walk(
         path,
-        |path, is_dir| filter_dirs(path) || (!is_dir && filter_fluent(path)),
+        |path, is_dir| filter_dirs(path) || (!is_dir && filter_not_fluent(path)),
         &mut |ent, contents| {
             check_lowercase(ent.path().to_str().unwrap(), contents, &mut check);
         },
