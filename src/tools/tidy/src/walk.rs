@@ -44,6 +44,11 @@ pub fn filter_not_rust(path: &Path) -> bool {
     path.extension() != Some(OsStr::new("rs")) && !path.is_dir()
 }
 
+/// Filter for only files that end in `.ftl` (Fluent translation files).
+pub fn filter_not_fluent(path: &Path) -> bool {
+    path.extension() != Some(OsStr::new("ftl")) && !path.is_dir()
+}
+
 pub fn walk(
     path: &Path,
     skip: impl Send + Sync + 'static + Fn(&Path, bool) -> bool,

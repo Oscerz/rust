@@ -5,11 +5,7 @@ use std::path::Path;
 use fluent_syntax::ast::{Entry, PatternElement};
 
 use crate::diagnostics::{CheckId, RunningCheck, TidyCtx};
-use crate::walk::{filter_dirs, walk};
-
-fn filter_fluent(path: &Path) -> bool {
-    if let Some(ext) = path.extension() { ext.to_str() != Some("ftl") } else { true }
-}
+use crate::walk::{filter_dirs, filter_not_fluent, walk};
 
 /// Messages allowed to have `.` at their end.
 ///
@@ -80,7 +76,7 @@ pub fn check(path: &Path, tidy_ctx: TidyCtx) {
 
     walk(
         path,
-        |path, is_dir| filter_dirs(path) || (!is_dir && filter_fluent(path)),
+        |path, is_dir| filter_dirs(path) || (!is_dir && filter_not_fluent(path)),
         &mut |ent, contents| {
             check_period(ent.path().to_str().unwrap(), contents, &mut check);
         },
