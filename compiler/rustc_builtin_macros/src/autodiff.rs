@@ -862,7 +862,7 @@ mod llvm_enzyme {
                     if act_ret.len() == 1 {
                         act_ret[0].clone()
                     } else {
-                        let kind = TyKind::Tup(act_ret.iter().map(|arg| arg.clone()).collect());
+                        let kind = TyKind::Tup(act_ret);
                         Box::new(rustc_ast::Ty { kind, id: ast::DUMMY_NODE_ID, span, tokens: None })
                     }
                 }
